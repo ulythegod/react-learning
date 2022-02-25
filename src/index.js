@@ -145,6 +145,7 @@ function     calculateWinner(squares) {
 }
 
 //React examples
+//Классовый компонент, стейты
 class Clock extends React.Component {
     constructor(props) {
         super(props);
