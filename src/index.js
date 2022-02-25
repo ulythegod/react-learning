@@ -144,7 +144,77 @@ function     calculateWinner(squares) {
     return null;
 }
 
+//React examples
+class Clock extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {date: new Date()};
+    }
+
+    componentDidMount() {
+        this.timerID = setInterval(
+            () => this.tick(),
+            1000
+        );
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
+
+    tick() {
+        this.setState({
+            date: new Date()
+        });
+    }
+
+    render() {
+        return (
+            <div>
+                <h1>Привет, мир!</h1>
+                <FormattedDate date={this.state.date} />
+            </div>
+        );
+    }
+}
+
+function FormattedDate(props) {
+    return <h2>Сейчас {props.date.toLocaleTimeString()}.</h2>;
+}
+
+//формы
+class NameForm extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {value: ''};
+  
+      this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+    }
+  
+    handleChange(event) {
+      this.setState({value: event.target.value});
+    }
+  
+    handleSubmit(event) {
+      alert('Отправленное имя: ' + this.state.value);
+      event.preventDefault();
+    }
+  
+    render() {
+      return (
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            Имя:
+            <input type="text" value={this.state.value} onChange={this.handleChange} />
+          </label>
+          <input type="submit" value="Отправить" />
+        </form>
+      );
+    }
+  }
+
 ReactDOM.render(
-    <Game />,
+    <NameForm />,
     document.getElementById('root')
 );
