@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+// import $ from "jquery";
+// import jQuery from "jquery";
+// import "chosen-js/chosen.css";
+// import "chosen-js/chosen.jquery.js";
 
 class Board extends React.Component {
     renderSquare(i) {
@@ -667,9 +671,81 @@ function Glossary(props) {
     );
 }
 
+//Интеграция с jQuery-плагином Chosen
+// function Example() {
+//     return (
+//         <Chosen onChange={value => console.log(value)}>
+//             <option>ваниль</option>
+//             <option>шоколад</option>
+//             <option>клубника</option>
+//         </Chosen>
+//     );
+// }
+
+// class Chosen extends React.Component {
+//     componentDidMount() {//вызывается после того как компонент отрендериться в dom
+//         this.$el = $(this.el);
+//         this.$el.chosen();
+
+//         this.handleChange = this.handleChange.bind(this);
+//         this.$el.on('change', this.handleChange);
+//     }
+
+//     componentWillUnmount() {//вызывается при удалении эл-та из dom
+//         this.$el.off('change', this.handleChange);
+//         this.$el.chosen('destroy');
+//     }
+
+//     componentDidUpdate(prevProps) {
+//         if (prevProps.children !== this.props.children) {
+//             this.$el.trigger("chosen:updated");
+//         }
+//     }
+
+//     handleChange(e) {
+//         this.props.onChange(e.target.value);
+//     }
+
+//     render() {
+//         return (
+//             <div>
+//                 <select className='Chosen-select' ref={el => this.el = el}>
+//                     {this.props.children}
+//                 </select>
+//             </div>
+//         );
+//     }
+// }
+
+//Использование записи через точку
+const MyComponents = {
+    DatePicker: function DatePicker(props) {
+        return <div>color of date {props.color}</div>
+    }
+}
+
+function BlueDatePicker() {
+    return <MyComponents.DatePicker color="blue" />
+}
+
+//В качестве типа React-элемента нельзя использовать выражение. 
+//Если вы хотите использовать выражение, чтобы указать тип элемента, 
+//присвойте его в переменную, начинающуюся с заглавной буквы.
+
+// const components = {
+//     photo: <div>photo</div>,
+//     video: <span>video</span>
+// };
+
+
+// function Story(props) {
+//     const SpecificStory = components[props.storyType];
+//     return <SpecificStory />
+// }
+
 ReactDOM.render(
     <>
-        <Glossary items={glossaryArr} />
+        <Story />
     </>,
     document.getElementById('root')
 );
