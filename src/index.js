@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Profiler } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import $ from "jquery";
@@ -743,10 +743,179 @@ function BlueDatePicker() {
 //     return <SpecificStory />
 // }
 
+//shouldComponentUpdate
+class CounterButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {count: 1}
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {//здесь проверка на наличие к-л изменений в props.color или state.count
+        if (this.props.color !== nextProps.color) {
+            return true;
+        }
+
+        if (this.state.count !== nextState.count) {
+            return true;
+        }
+
+        return false;
+    }
+
+    render() {
+        return (
+            <button
+                color={this.props.color}
+                onClick={() => this.setState(state => ({count: state.count + 1}))}
+            >
+                Счетчик: {this.state.count}
+            </button>
+        )
+    }
+}
+
+class CounterButton2 extends React.PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {count: 1};
+    }
+
+    render() {
+        return (
+            <button
+                color={this.props.color}
+                onClick={() => this.setState(state => ({count: state.count + 1}))}>
+                Счётчик: {this.state.count}
+            </button>
+        );
+    }
+}
+
+//Сила иммутабельных данных
+class ListOfWords extends React.PureComponent {
+    render() {
+        return <div>{this.props.words.join(',')}</div>
+    }
+}
+
+class WordAdder extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            words: ['word']
+        };
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick() {
+        this.setState(state => ({
+            words: [...state.words, 'word']
+        }))
+    }
+
+    render() {
+        return (
+            <div>
+                <button
+                    onClick={this.handleClick}
+                />
+                <ListOfWords
+                    words={this.state.words}
+                />
+            </div>
+        )
+    }
+}
+
+//Всплытие событий через порталы
+//два соседних контейнера в DOM
+const appRoot = document.getElementById('root');
+const modalRoot = document.getElementById('modal-root');
+
+class Modal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.el = document.createElement('div');
+    }
+
+    componentDidMount() {
+        modalRoot.appendChild(this.el);
+    }
+
+    componentWillUnmount() {
+        modalRoot.removeChild(this.el);
+    }
+
+    render() {
+        return ReactDOM.createPortal(
+            this.props.children,
+            this.el
+        );
+    }
+}
+
+class Parent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {clicks: 0};
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick() {
+        this.setState(state => ({
+            clicks: state.clicks + 1
+        }))
+    }
+
+    render() {
+        return (
+            <Profiler>
+                <div onClick={this.handleClick}>
+                    <p>Количество кликов: {this.state.clicks}</p>
+                    <p>
+                        Откройте DevTools браузера, чтобы
+                        убедиться, что кнопка не является
+                        потомком блока div с обработчиком
+                        onClick.
+                    </p>
+                    <Modal>
+                        <Child />
+                    </Modal>
+                </div>
+            </Profiler>
+        );
+    }
+}
+
+function Child() {
+    return (
+        <div className='modal'>
+            <button>Кликните</button>
+        </div>
+    );
+}
+
+//React без ES6
+var createReactClass = require('create-react-class');
+var Greeting = createReactClass({
+    render: function() {
+        return <h1>Hello, Julia!</h1>
+    }
+})
+
+//React без JSX
+class Hello extends React.Component {
+    render() {
+        return React.createElement(
+            'div',
+            null,
+            `Hello, ${this.props.toWhat}`
+        );
+    }
+}
+
 ReactDOM.render(
-    <>
-        <Story />
-    </>,
-    document.getElementById('root')
+    React.createElement(Hello, {toWhat: 'мир'}, null),
+    appRoot
 );
 
