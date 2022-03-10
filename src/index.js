@@ -914,8 +914,251 @@ class Hello extends React.Component {
     }
 }
 
+//Добавление рефа к DOM-элементу
+//ref используется для сохранения ссылки
+class CustomTextInput1 extends React.Component {
+    constructor(props) {
+        super(props);
+
+        //создание рефа в поле textInput для хранения DOM-элемента
+        this.textInput = React.createRef();
+        this.focusTextInput = this.focusTextInput.bind(this);
+    }
+
+    focusTextInput() {
+        //установка фокуса на текстовое поле с помощью чистого DOM API
+        //примечание: обращаемся к current, чтобы получить DOM-узел
+        this.textInput.current.focus();
+    }
+
+    render() {
+        //описываем, что мы хотим связать реф input 
+        //с textInput созданным в конструкторе
+        return (
+            <div>
+                <input
+                    type="text"
+                    ref={this.textInput}
+                />
+                <input
+                    type="button"
+                    value="фокус на текстовом поле"
+                    onClick={this.focusTextInput}
+                />
+            </div>
+        );
+    }
+}
+
+//Добавление рефа к классовому компоненту
+//для того, чтобы произвести имитацию клика по customTextInput сразу же после 
+//монтирования, можно
+//использовать реф, чтобы получить доступ к пользовательскому input и явно 
+//вызвать его метод focusTextInput
+class AutoFocusTextInput extends React.Component {
+    constructor(props) {
+        super(props);
+        this.textInput = React.createRef();
+    }
+
+    componentDidMount() {
+        this.textInput.current.focusTextInput();
+    }
+
+    render() {
+        return (
+            <CustomTextInput1 ref={this.textInput} />
+        )
+    }
+}
+
+//Колбэк-рефы
+class CustomTextInput2 extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.textInput = null;
+
+        this.setTextInputRef = element => {
+            this.textInput = element;
+        };
+
+        this.focusTextInput = () => {
+            //устанавливаем фокус на текстовом поле ввода с помощью чистого DOM API
+            if (this.textInput) {
+                this.textInput.focus();
+            }
+        }
+    }
+
+    componentDidMount() {
+        //устанавливаем фокус на input при монтировании
+        this.focusTextInput();
+    }
+
+    render() {
+        //используем колбэк реф, чтобы сохранить ссылку на DOM элемент
+        //поля текстового ввода в поле экземпляра (например, this.textInput)
+
+        //react вфзовет ref коллбэк с ДОМ элементом при монтировании компонента
+        //а также вызовет его со значением null при размонтировании. Рефы будут 
+        //хранить актуальное значение перед вызовом методов componentDidMount или
+        //componentDidUpdate
+        return (
+            <div>
+                <input
+                    type="text"
+                    ref={this.setTextInputRef}
+                />
+                <input 
+                    type="button"
+                    value="focus the text input"
+                    onClick={this.focusTextInput}
+                />
+            </div>
+        )
+    }
+}
+
+//Использование рендер-пропа для сквозных задач
+//компонент отслеживает положение мыши
+class MouseTracker extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.state = {x: 0, y: 0};
+    }
+
+    handleMouseMove(event) {
+        this.setState({
+            x: event.clientX,
+            y: event.clientY
+        })
+    }
+
+    render() {
+        return (
+            <div style={{height: '100vh'}} onMouseMove={this.handleMouseMove}>
+                <h1>перемещайте курсор мыши!</h1>
+                <p>текущее положение курсора мыши: ({this.state.x}, {this.state.y})</p>
+            </div>
+        );
+    }
+}
+
+//использование этого поведения в другом компоненте
+// Компонент <Mouse> инкапсулирует поведение, которое нам необходимо
+class Mouse extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.state = {x: 0, y: 0};
+    }
+
+    handleMouseMove(event) {
+        this.setState({
+            x: event.clientX,
+            y: event.clientY
+        });
+    }
+
+    render() {
+        return (
+            <div style={{height: '100vh'}} onMouseMove={this.handleMouseMove}>
+                {/* но как можно отрендерить что-то кроме p */}
+                <p>текущее положение курсора мыши: ({this.state.x}, {this.state.y})</p>
+            </div>
+        );
+    }
+}
+
+//у нас есть компонент <Cat>, который рендерит изображение 
+//кошки, преследующей мышь по экрану
+class Cat extends React.Component {
+    render() {
+        const mouse = this.props.mouse;
+        return (
+            <img src='./cat.gif' style={{position: 'absolute', left: mouse.x, top: mouse.y}}/>
+        );
+    }
+}
+
+class MouseWithCat extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.state = {x: 0, y: 0};
+    }
+
+    handleMouseMove(event) {
+        this.setState({
+            x: event.clientX,
+            y: event.clientY
+        });
+    }
+
+    render() {
+        return (
+            <div style={{height: '100vh'}} onMouseMove={this.handleMouseMove}>
+                {/*
+                    можно было бы просто поменять p на Cat, но тогда нужно создать
+                    отдельный компонент MouseWithSomethingElse. каждый раз, когда
+                    он нам нужен, поэтому MouseWithCat пока что нельзя повторно 
+                    использовать
+                */}
+                <Cat mouse={this.state}/>
+            </div>
+        );
+    }
+}
+
+class MouseWithoutCat extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.state = {x: 0, y: 0}
+    }
+
+    handleMouseMove(event) {
+        this.setState({
+            x: event.clientX,
+            y: event.clientY
+        });
+    }
+
+    render() {
+        return (
+            <div style={{height: '100vh'}} onMouseMove={this.handleMouseMove}>
+                {/* вместо статического представления того, что 
+                    рендерит MouseWithoutCat используется рендер-проп для 
+                    динамического определения, что отрендерить */}
+                {this.props.render(this.state)}
+            </div>
+        )
+    }
+}
+
+class MouseTracker1 extends React.Component {
+    render() {
+        return (
+            <>
+                <React.StrictMode>
+                    <h1>перемещайте курсор мыши!</h1>
+                    <MouseWithoutCat 
+                        render={mouse => (
+                            <Cat mouse={mouse} />
+                        )}                
+                    />
+                </React.StrictMode>
+            </>
+        );
+    }
+}
+
 ReactDOM.render(
-    React.createElement(Hello, {toWhat: 'мир'}, null),
+    <>
+        <MouseTracker1 />
+    </>,
     appRoot
 );
 
