@@ -1,6 +1,7 @@
 import React, { Profiler } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import PropTypes from 'prop-types';
 // import $ from "jquery";
 // import jQuery from "jquery";
 // import "chosen-js/chosen.css";
@@ -1155,9 +1156,189 @@ class MouseTracker1 extends React.Component {
     }
 }
 
+//Проверка типов с помощью PropTypes
+class Greeting1 extends React.Component {
+    render() {
+        return (
+            <h1>Hello {this.props.name}</h1>
+        );
+    }
+}
+
+Greeting1.propTypes = {
+    name: PropTypes.string
+}
+
+//Значения пропсов по умолчанию
+class Greeting2 extends React.Component {
+    render() {
+        return (
+            <h1>Hello {this.props.name}</h1>
+        );
+    }
+}
+
+Greeting2.defaultProps = {
+    name: "unknown"
+}
+
+//Функциональные компоненты
+function HelloWorldComponent({name}) {
+    return (
+        <div>Hello {name}</div>
+    )
+}
+
+HelloWorldComponent.propTypes = {
+    name: PropTypes.string
+}
+
+//Обработчик неуправляемого компонента может получить имя от элемента input
+class NameForm1 extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.input = React.createRef();
+    }
+
+    handleSubmit(event) {
+        alert('Sent name: ' + this.input.current.value);
+        event.preventDefault();
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                <label>
+                    Name:
+                    <input defaultValue="Sierra" type="text" ref={this.input}/>
+                </label>
+                <input type={"submit"} value="Send"/>
+            </form>
+        );
+    }
+}
+
+//Тег поля загрузки файла
+class FileInput extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.fileInput = React.createRef();
+    }
+
+    handleSubmit(event) {
+        event.preventDefault();
+        alert(
+            `Selected file - ${this.fileInput.current.files[0].name}`
+        );
+    }
+
+    render() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                <label>
+                    Upload file:
+                    <input type={"file"} ref={this.fileInput} />
+                </label>
+                <br />
+                <button type='submit'>Submit</button>
+            </form>
+        );
+    }
+}
+
+//Использование веб-компонентов в React
+class HelloMessage extends React.Component {
+    render() {
+        return <div>Hello <x-search class="test-class">{this.props.name}</x-search></div>;
+    }
+}
+
+//жизненный цикл компонента
+class ClickButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { class: "off", label: "push" };
+
+        this.press = this.press.bind(this);
+
+        console.log("constructor");
+    }
+
+    static getDerivedStateFromError(props, state) {
+        console.log("getDerivedStateFromError");
+        return null;
+    }
+
+    componentDidMount() {
+        console.log("componentDidMount");
+    }
+
+    componentWillUnmount() {
+        console.log("componentWillUnmount");
+    };
+
+    shouldComponentUpdate() {
+        console.log("shouldComponentUpdate");
+        return true;
+    }
+
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        console.log("getSnapshotBeforeUpdate");
+        return null;
+    }
+
+    componentDidUpdate() {
+        console.log("componentDidUpdate");
+    }
+
+    press() {
+        let className = (this.state.class === "off") ? "on" : "off";
+        this.setState({class: className});
+    }
+
+    render() {
+        console.log("render");
+        return (
+            <button
+                onClick={this.press}
+                id="test"
+            >
+                {this.state.label}
+            </button>
+        );
+    }
+}
+
+class DeleteButton extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {isButton: false, label: "Показать"};
+
+        this.handleButtonAppearence = this.handleButtonAppearence.bind(this);
+    };
+
+    handleButtonAppearence() {
+        let labelBtn = (this.state.label === "Скрыть") ? "Показать" : "Скрыть";
+        this.setState({label: labelBtn});
+        this.setState({isButton: !this.state.isButton});
+    }
+
+    render() {
+        return (
+            <>
+                {this.state.isButton && <ClickButton />}
+                <button onClick={this.handleButtonAppearence}>{this.state.label}</button>
+            </>
+        );
+    }
+}
+
 ReactDOM.render(
     <>
-        <MouseTracker1 />
+        <DeleteButton />
     </>,
     appRoot
 );
