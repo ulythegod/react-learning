@@ -2,6 +2,8 @@ import React, { Profiler } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
+import ReactTestUtils from 'react-dom/test-utils';
+import {act} from 'react-dom/test-utils';
 // import $ from "jquery";
 // import jQuery from "jquery";
 // import "chosen-js/chosen.css";
@@ -1323,6 +1325,7 @@ class DeleteButton extends React.Component {
     handleButtonAppearence() {
         let labelBtn = (this.state.label === "Скрыть") ? "Показать" : "Скрыть";
         this.setState({label: labelBtn});
+        //ReactDOM.unmountComponentAtNode(document.getElementById('root'));//удаляет все компоненты на топ-уровне рут
         this.setState({isButton: !this.state.isButton});
     }
 
@@ -1336,10 +1339,10 @@ class DeleteButton extends React.Component {
     }
 }
 
-ReactDOM.render(
-    <>
-        <DeleteButton />
-    </>,
-    appRoot
-);
+// ReactDOM.render(
+//     <>
+//         <DeleteButton />
+//     </>,
+//     appRoot
+// );
 
