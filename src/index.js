@@ -1,4 +1,4 @@
-import React, { Profiler } from 'react';
+import React, { Profiler, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
@@ -1339,10 +1339,201 @@ class DeleteButton extends React.Component {
     }
 }
 
-// ReactDOM.render(
-//     <>
-//         <DeleteButton />
-//     </>,
-//     appRoot
-// );
+//Хуки
+function Example() {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        document.title =  `Вы нажали ${count} раз`;
+        console.log('Эффект срабатывает');
+
+        return () => {
+            document.title =  `Эффект сброшен`;
+            console.log('Эффект сброшен');//React будет сбрасывать эффект перед 
+            //тем, как компонент размонтируется
+        }
+    });
+
+    return (
+        <div>
+            <p>Вы кликнули {count} раз</p>
+            <button onClick={() => setCount(count + 1)}>
+                Нажми на меня
+            </button>
+        </div>
+    );
+}
+
+function Example2() {
+    const [st, setSt] = useState("text");
+
+    return (
+        <>
+            <button onClick={() => setSt("text123")}>
+                click
+            </button>
+            {(st === "text") ? <ComponentInputText /> : <ComponentInputText2 />}
+        </>
+    )
+}
+
+//Эквивалентный пример с классом
+class Example1 extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            count: 0
+        };
+    }
+
+    componentDidMount() {
+        document.title = `Вы кликнули ${this.state.count} раз`;
+    }
+
+    componentDidUpdate() {
+        document.title = `Вы кликнули ${this.state.count} раз`;
+    }
+
+    render() {
+        return (
+            <div>
+                <p>Вы кликнули {this.state.count} раз</p>
+                <button
+                    onClick={() => this.setState({count: this.state.count + 1})}
+                >  
+                    Click on me
+                </button>
+            </div>
+        );
+    }    
+}
+
+class ComponentInputText extends React.Component {
+    componentDidMount() {
+        console.log("componentDidMount компонент ComponentInputText смонтирован");
+    }
+
+    componentWillUnmount() {
+        console.log("componentWillUnmount компонент ComponentInputText размонтирован");
+    }
+
+    render() {
+        return (
+            <div>
+                <input type="text"/>
+            </div>
+        );
+    }
+}
+
+class ComponentInputText2 extends React.Component {
+    componentDidMount() {
+        console.log("componentDidMount компонент ComponentInputText2 смонтирован");
+    }
+
+    render() {
+        return (
+            <div>
+                <input type="text"/>
+            </div>
+        );
+    }
+}
+
+//подписка на статус друга в сети
+// function FriendStatus(props) {
+//     const [isOnline, setIsOnline] = useState(null);
+
+//     function handleStatusChange(status) {
+//         setIsOnline(status.isOnline);
+//     }
+
+//     useEffect(() => {
+//         ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+
+//         return () => {
+//             ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+//         };
+//     });
+
+//     if (isOnline === null) {
+//         return 'Загрузка...';
+//     }
+
+//     return isOnline ? 'Online' : 'Offline';
+// }
+
+//Пользовательский хук
+// function useFriendStatus(friendID) {
+//     const [isOnline, setIsOnline] = useState(null);
+
+//     function handleStatusChange(status) {
+//         setIsOnline(status.isOnline);
+//     }
+
+//     useEffect(() => {
+//         ChatAPI.subscribeToFriendStatus(friendID, handleStatusChange);
+
+//         return() => {
+//             ChatAPI.unsubscribeFromFriendStatus(friendID, handleStatusChange);
+//         }
+//     });
+
+//     return isOnline;
+// }
+
+// function FriendStatus(props) {
+//     const isOnline = useFriendStatus(props.friend.id);
+
+//     if (isOnline === null) {
+//         return 'Loading...';
+//     }
+
+//     return isOnline ? 'Online' : 'Offline';
+// }
+
+// function FriendListItem(props) {
+//     const isOnline = useFriendStatus(props.friend.id);
+
+//     return (
+//         <li style={{color: isOnline ? 'green' : 'black'}}>
+//             {props.friend.name}
+//         </li>
+//     );
+// }
+
+//Правила хуков
+function Form() {
+    //1. Используем переменную состояния name
+    const [name, setName] = useState('Mary');
+
+    //2. Используем эффект для сохранения данных формы
+    
+    useEffect(function persistForm() {
+        if (name !== '') {
+            localStorage.setItem('formData', name);
+        }
+    });
+
+    //3. Используем переменную состояния surname
+    const [surname, setSurname] = useState('Poppins');
+
+    //4. используем эффект для обновления заголовка страницы
+    useEffect(function updateTitle() {
+        document.title = name + ' ' + surname;
+    });
+
+    return (
+        <div>
+            {name + ' ' + surname}
+        </div>
+    );
+}
+
+ReactDOM.render(
+    <>
+        <Form />
+    </>,
+    appRoot
+);
 
