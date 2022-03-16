@@ -1,4 +1,4 @@
-import React, { Profiler, useEffect, useState } from 'react';
+import React, { Profiler, useContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import PropTypes from 'prop-types';
@@ -1530,9 +1530,110 @@ function Form() {
     );
 }
 
+//Передача информации между хуками
+// const friendList = [
+//     {id: 1, name: 'Tatiana'},
+//     {id: 2, name: 'Alla'},
+//     {id: 3, name: 'Lilya'},
+// ];
+
+// function ChatRecipientPicker() {
+//     const [reciepientID, setReciepientID] = useState(1);
+//     const isReciepientOnline = useFriendStatus(reciepientID);
+
+//     return (
+//         <>
+//             <div>{isReciepientOnline ? 'GREEN': 'RED'}</div>
+//             <select 
+//                 value={reciepientID}
+//                 onChange={e => setReciepientID(Number(e.target.value))}
+//             >
+//                 {friendList.map(friend => (
+//                     <option key={friend.id} value={friend.id}>
+//                         {friend.name}
+//                     </option>
+//                 ))}
+//             </select>
+//         </>
+//     );
+// }
+
+//Функциональные обновления
+function Counter({initialCount}) {
+    const [count, setCount] = useState(initialCount);
+
+    return (
+        <>
+            Count: {count}
+            <button onClick={() => setCount(initialCount)}>Clear</button>
+            <button onClick={() => setCount(prevCount => prevCount - 1)}>-</button>
+            <button onClick={() => setCount(prevCount => prevCount + 1)}>+</button>
+        </>
+    );
+}
+
+//useContext
+const themes = {
+    light: {
+        foreground: "#000000",
+        background: "#eeeeee"
+    },
+    dark: {
+        foreground: "#ffffff",
+        background: "#222222"
+    }
+};
+
+//контекст позволяет передавать значение глубоко
+//в дерево компонентов без явной передачи пропсов
+//на каждом уровне. Создадим контекст для текущей UI-темы
+//со значением light по умолчению
+const ThemeContext2 = React.createContext(themes.light);
+
+function App2() {
+    //компонент Provider используется для передачи текущей
+    //UI-темы вниз по дереву. Любой компонент может
+    //использовать этот контекст и не важно как глубоко
+    //он находится. В этом примере передается dark 
+    //в кач-ве контекста
+    return (
+        <>        
+            <ThemeContext2.Provider value={themes.dark}>
+                <Toolbar2 />
+            </ThemeContext2.Provider>
+            {/*когда нет компонента провайдера, используется значение по умолчанию themes.light*/}
+            <Toolbar2 />
+        </>
+    );
+}
+
+
+//компонент, который находится в середине,
+//больше не должен явно передавать эту тему вниз
+function Toolbar2(props) {
+    return (
+        <div>
+            <ThemeButton2 />
+        </div>
+    );
+}
+
+function ThemeButton2() {
+    //получем значение контекста. Реакт найдет (выше по дереву)
+    //ближайший компонент Провайдер, предоставивший этот контекст
+    //и использует его значение. В этом примере значение будет themes.dark
+    const theme = useContext(ThemeContext2);
+
+    return (
+        <button style={{background: theme.background, color: theme.foreground}}>
+            styled by theme from the context
+        </button>
+    );
+}
+
 ReactDOM.render(
     <>
-        <Form />
+        <App2 />
     </>,
     appRoot
 );
