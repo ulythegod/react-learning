@@ -4,6 +4,8 @@ import './index.css';
 import PropTypes from 'prop-types';
 import ReactTestUtils from 'react-dom/test-utils';
 import {act} from 'react-dom/test-utils';
+import { createStore } from 'redux';
+import { createSlice, configureStore } from '@reduxjs/toolkit';
 // import $ from "jquery";
 // import jQuery from "jquery";
 // import "chosen-js/chosen.css";
@@ -1507,8 +1509,7 @@ function Form() {
     //1. Используем переменную состояния name
     const [name, setName] = useState('Mary');
 
-    //2. Используем эффект для сохранения данных формы
-    
+    //2. Используем эффект для сохранения данных формы    
     useEffect(function persistForm() {
         if (name !== '') {
             localStorage.setItem('formData', name);
@@ -1630,6 +1631,79 @@ function ThemeButton2() {
         </button>
     );
 }
+
+//REDUX
+/*
+Это reducer - функция, которая берет текущее значение состояния и
+объект действия, кот. описывает "что произошло", и возвращает новое значение состояния.
+Определение ф-ции reducer: (state, action) => newState
+
+Состояние Redux содержит только простые js объекты, массивы и примитивы.
+Корневое значение состояния обычно объект. Важно изменять не
+объект состояния, а возвращать новый объект, когда состояние меняется.
+
+Можно использовать условия в ф-ции reducer. В этом примере использульется switch
+*/
+function counterReducer(state = {value: 0}, action) {
+    switch (action.type) {
+        case 'counter/incremented':
+            return {value: state.value + 1}
+        case 'counter/decremented':
+            return {value: state.value - 1}
+        default:
+            return state
+    }
+}
+
+//создание Redux хранилища, которое поддерживает состояние вашего приложения.
+//его API это { subscribe, dispatch, getState }
+let store = createStore(counterReducer);
+
+//Можно подписаться subscribe() для обновления UI после ответа на изменение состояния.
+//Обычно использовалась бы библиотека (например, React Redux), а не subscribe() напрямую.
+//Есть еще дополнительные юз-кейсы, где полезно использовать subscribe()
+store.subscribe(() => console.log(store.getState()));
+
+//Единственный способ изменить все состояние - это отправка действия (dispatch)
+//действия м.б. сериализованы, залоггированы или сохранены и позже повторены
+// store.dispatch({ type: 'counter/incremented' });
+// store.dispatch({ type: 'counter/incremented' });
+
+// store.dispatch({ type: 'counter/decremented' });
+
+// store.dispatch({ type: 'counter/incremented' });
+// store.dispatch({ type: 'counter/incremented' });
+// store.dispatch({ type: 'counter/incremented' });
+
+// store.dispatch({ type: 'counter/decremented' });
+
+//Redux Toolkit Example
+const counterSlice = createSlice({
+    name: 'counter',
+    initialState: {
+        value: 0
+    },
+    reducers: {
+        incremented: state => {
+            state.value += 1
+        },
+        decremented: state => {
+            state.value =- 1
+        }
+    }
+})
+
+export const {incremented, decremented} = counterSlice.actions
+
+const store1 = configureStore({
+    reducer: counterSlice.reducer
+})
+
+store1.subscribe(() => console.log(store1.getState()))
+
+store1.dispatch(incremented())
+store1.dispatch(incremented())
+store1.dispatch(decremented())
 
 ReactDOM.render(
     <>
