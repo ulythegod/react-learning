@@ -6,6 +6,7 @@ import ReactTestUtils from 'react-dom/test-utils';
 import {act} from 'react-dom/test-utils';
 import { createStore } from 'redux';
 import { createSlice, configureStore } from '@reduxjs/toolkit';
+import CounterEx from './Counter';
 // import $ from "jquery";
 // import jQuery from "jquery";
 // import "chosen-js/chosen.css";
@@ -1701,13 +1702,13 @@ const store1 = configureStore({
 
 store1.subscribe(() => console.log(store1.getState()))
 
-store1.dispatch(incremented())
-store1.dispatch(incremented())
-store1.dispatch(decremented())
+// store1.dispatch(incremented())
+// store1.dispatch(incremented())
+// store1.dispatch(decremented())
 
 ReactDOM.render(
     <>
-        <App2 />
+        <CounterEx />
     </>,
     appRoot
 );
